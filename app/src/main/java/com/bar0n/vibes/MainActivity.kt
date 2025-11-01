@@ -231,7 +231,8 @@ fun MainScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Vibes") })
+            TopAppBar(title = { Text("Vibes") }, expandedHeight = 30.dp)
+
         },
         modifier = Modifier.fillMaxSize()
     ) {
@@ -248,11 +249,11 @@ fun MainScreen(
                 Button(onClick = { onListenStateChanged(true) }, enabled = !isListening) {
                     Text("Start")
                 }
+                Text("Duration: ${recordingDuration / 1000}s")
                 Button(onClick = { onListenStateChanged(false); onSaveData() }, enabled = isListening) {
                     Text("Stop")
                 }
             }
-            Text("Recording duration: ${recordingDuration / 1000}s")
 
             VibrationScreen(vibrationViewModel)
             SoundScreen(soundViewModel)
@@ -277,12 +278,15 @@ fun VibrationScreen(viewModel: VibrationViewModel) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text("Vibration", style = MaterialTheme.typography.titleLarge)
-            Text(text = "Current: %.2f".format(currentVibration), style = MaterialTheme.typography.bodyLarge)
-            Text(text = "Overall Average: %.2f".format(overallAverage), style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Window Average: %.2f".format(windowAverage), style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Max Value: %.2f".format(maxVibration), style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Min Value: %.2f".format(minVibration), style = MaterialTheme.typography.bodyMedium)
+            Text("Vibration: %.2f".format(currentVibration), style = MaterialTheme.typography.titleLarge)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)){
+                Text(text = "Overall Avg: %.2f".format(overallAverage), style = MaterialTheme.typography.bodyMedium)
+                Text(text = "Window Avg: %.2f".format(windowAverage), style = MaterialTheme.typography.bodyMedium)
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)){
+                Text(text = "Min: %.2f".format(minVibration), style = MaterialTheme.typography.bodyMedium)
+                Text(text = "Max: %.2f".format(maxVibration), style = MaterialTheme.typography.bodyMedium)
+            }
             DataGraph(graphData, MaterialTheme.colorScheme.primary)
         }
     }
@@ -305,12 +309,16 @@ fun SoundScreen(viewModel: SoundViewModel) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text("Sound (Decibels)", style = MaterialTheme.typography.titleLarge)
-            Text(text = "Current: %.2f dB".format(currentDecibel), style = MaterialTheme.typography.bodyLarge)
-            Text(text = "Overall Average: %.2f dB".format(overallAverage), style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Window Average: %.2f dB".format(windowAverage), style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Max Value: %.2f dB".format(maxValue), style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Min Value: %.2f dB".format(minValue), style = MaterialTheme.typography.bodyMedium)
+            Text("Sound: %.2f dB".format(currentDecibel), style = MaterialTheme.typography.titleLarge)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)){
+                Text(text = "Overall Avg: %.2f dB".format(overallAverage), style = MaterialTheme.typography.bodyMedium)
+                Text(text = "Window Avg: %.2f dB".format(windowAverage), style = MaterialTheme.typography.bodyMedium)
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)){
+                Text(text = "Min: %.2f dB".format(minValue), style = MaterialTheme.typography.bodyMedium)
+                Text(text = "Max: %.2f dB".format(maxValue), style = MaterialTheme.typography.bodyMedium)
+            }
+
             DataGraph(graphData, MaterialTheme.colorScheme.secondary)
         }
     }
@@ -373,7 +381,8 @@ fun ResultsScreen(
                             contentDescription = "Back"
                         )
                     }
-                }
+                },
+                expandedHeight = 30.dp
             )
         }
     ) { paddingValues ->
@@ -394,8 +403,10 @@ fun ResultsScreen(
                 ) {
                     Text("Vibration Data", style = MaterialTheme.typography.titleLarge)
                     DataGraph(vibrationData.map { it.timestamp to it.value }, MaterialTheme.colorScheme.primary)
-                    vibrationStats.forEach { (key, value) ->
-                        Text(text = "$key: %.2f".format(value), style = MaterialTheme.typography.bodyMedium)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)){
+                        vibrationStats.forEach { (key, value) ->
+                            Text(text = "$key: %.2f".format(value), style = MaterialTheme.typography.bodyMedium)
+                        }
                     }
                     Button(onClick = { onSaveVibrationCsv(vibrationCsv) }) {
                         Text("Save Vibration as CSV")
@@ -409,10 +420,12 @@ fun ResultsScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text("Sound Data", style = MaterialTheme.typography.titleLarge)
+                    Text("Sound Data (dB)", style = MaterialTheme.typography.titleLarge)
                     DataGraph(soundData.map { it.timestamp to it.value }, MaterialTheme.colorScheme.secondary)
-                    soundStats.forEach { (key, value) ->
-                        Text(text = "$key: %.2f dB".format(value), style = MaterialTheme.typography.bodyMedium)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)){
+                        soundStats.forEach { (key, value) ->
+                            Text(text = "$key: %.2f".format(value), style = MaterialTheme.typography.bodyMedium)
+                        }
                     }
                     Button(onClick = { onSaveSoundCsv(soundCsv) }) {
                         Text("Save Sound as CSV")
